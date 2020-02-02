@@ -1,2 +1,2 @@
 # velocity-template-engine-plugin
-lcmatrix的velocity模板插件
+lcmatrix代码生成器的velocity模板插件
