@@ -36,6 +36,7 @@ public class VelocityPlugin extends AbstractTemplateEnginePlugin {
             Velocity.evaluate(model2Context(model), sw, "velocity plugin", new FileReader(templateFile));
         } catch (FileNotFoundException e) {
             getLogger().error("template file not found");
+            throw new RuntimeException("template file not found", e);
         }
         return sw.toString();
     }
@@ -54,6 +55,7 @@ public class VelocityPlugin extends AbstractTemplateEnginePlugin {
                             method.invoke(model, invokeParams));
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     getLogger().warn("model trans to context error", e);
+                    throw new RuntimeException("model trans to context error", e);
                 }
             }
         }
