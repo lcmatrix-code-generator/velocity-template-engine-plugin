@@ -1,5 +1,5 @@
 {
   "name": "velocity engine",
   "class": "top.lcmatrix.util.codegenerator.plugin.velocity.VelocityPlugin",
-  "version": 1.0
+  "version": 1.1
 }
