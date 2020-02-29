@@ -5,10 +5,7 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import top.lcmatrix.util.codegenerator.common.plugin.AbstractTemplateEnginePlugin;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.StringWriter;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -19,26 +16,40 @@ public class VelocityPlugin extends AbstractTemplateEnginePlugin {
     }
 
     @Override
-    public String apply(String s, Object model) {
-        StringWriter sw = new StringWriter();
+    public byte[] apply(String s, Object model) {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        OutputStreamWriter outputStreamWriter = new OutputStreamWriter(byteArrayOutputStream);
         VelocityContext velocityContext = model2Context(model);
         for (Object key : velocityContext.getKeys()) {
             System.out.println(key + "=" + velocityContext.get(key.toString()));
         }
-        Velocity.evaluate(velocityContext, sw, "velocity plugin", s);
-        return sw.toString();
+        Velocity.evaluate(velocityContext, outputStreamWriter, "velocity plugin", s);
+        try {
+            outputStreamWriter.flush();
+        } catch (IOException e) {
+            getLogger().error("apply template error", e);
+            return null;
+        }
+        return byteArrayOutputStream.toByteArray();
     }
 
     @Override
-    public String apply(File templateFile, Object model) {
-        StringWriter sw = new StringWriter();
+    public byte[] apply(File templateFile, Object model) {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        OutputStreamWriter outputStreamWriter = new OutputStreamWriter(byteArrayOutputStream);
         try {
-            Velocity.evaluate(model2Context(model), sw, "velocity plugin", new FileReader(templateFile));
+            Velocity.evaluate(model2Context(model), outputStreamWriter, "velocity plugin", new FileReader(templateFile));
         } catch (FileNotFoundException e) {
             getLogger().error("template file not found");
             throw new RuntimeException("template file not found", e);
         }
-        return sw.toString();
+        try {
+            outputStreamWriter.flush();
+        } catch (IOException e) {
+            getLogger().error("apply template error", e);
+            return null;
+        }
+        return byteArrayOutputStream.toByteArray();
     }
 
     private VelocityContext model2Context(Object model){
