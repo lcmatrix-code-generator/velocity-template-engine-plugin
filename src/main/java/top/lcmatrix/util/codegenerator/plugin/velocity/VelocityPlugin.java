@@ -16,21 +16,11 @@ public class VelocityPlugin extends AbstractTemplateEnginePlugin {
     }
 
     @Override
-    public byte[] apply(String s, Object model) {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        OutputStreamWriter outputStreamWriter = new OutputStreamWriter(byteArrayOutputStream);
+    public String apply(String s, Object model) {
+        StringWriter sw = new StringWriter();
         VelocityContext velocityContext = model2Context(model);
-        for (Object key : velocityContext.getKeys()) {
-            System.out.println(key + "=" + velocityContext.get(key.toString()));
-        }
-        Velocity.evaluate(velocityContext, outputStreamWriter, "velocity plugin", s);
-        try {
-            outputStreamWriter.flush();
-        } catch (IOException e) {
-            getLogger().error("apply template error", e);
-            return null;
-        }
-        return byteArrayOutputStream.toByteArray();
+        Velocity.evaluate(velocityContext, sw, "velocity plugin", s);
+        return sw.toString();
     }
 
     @Override
