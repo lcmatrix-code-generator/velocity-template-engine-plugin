@@ -25,21 +25,19 @@ public class VelocityPlugin extends AbstractTemplateEnginePlugin {
 
     @Override
     public byte[] apply(File templateFile, Object model) {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        OutputStreamWriter outputStreamWriter = new OutputStreamWriter(byteArrayOutputStream);
+        StringWriter sw = new StringWriter();
         try {
-            Velocity.evaluate(model2Context(model), outputStreamWriter, "velocity plugin", new FileReader(templateFile));
+            Velocity.evaluate(model2Context(model), sw, "velocity plugin", new FileReader(templateFile));
         } catch (FileNotFoundException e) {
             getLogger().error("template file not found");
             throw new RuntimeException("template file not found", e);
         }
         try {
-            outputStreamWriter.flush();
-        } catch (IOException e) {
+            return sw.toString().getBytes("UTF-8");
+        } catch (UnsupportedEncodingException e) {
             getLogger().error("apply template error", e);
-            return null;
+            throw new RuntimeException(e);
         }
-        return byteArrayOutputStream.toByteArray();
     }
 
     private VelocityContext model2Context(Object model){
